@@ -127,69 +127,12 @@ export default function ProfileeditScreen({navigation}) {
             autoCapitalize="none"
           />
         </View>
-        <View style={styles.inputgroup}> 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            placeholder="Password must be at least 8 characters long"
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.inputgroup}> 
-          <Text style={styles.label}>Confirm Password</Text>
-          <TextInput
-            placeholder="Re-enter your password"
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.inputgroup}> 
-          <Text style={styles.label}>PIN</Text>
-          <TextInput
-            placeholder="PIN number must be 4 digits "
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.inputgroup}> 
-          <Text style={styles.label}>Confirm PIN</Text>
-          <TextInput
-            placeholder="Re-enter your PIN number"
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <Button onPress={()=>{navigation.navigate('LinkbankScreen');}}  color={theme.colors.backgroundColor} style={styles.mannual}>
+
+        <Button onPress={()=>{}}  color={theme.colors.backgroundColor} style={styles.mannual}>
             <Text style={styles.bttext}>
-              Sign Up
+              Save
             </Text>
         </Button>
-      </View>
-      <View style={styles.footer}>
-        <Text style={styles.desc}>
-          Already have an account? 
-          <TouchableOpacity onPress={()=>{navigation.navigate('LoginScreen');}}>
-            <Text style={styles.redir}>
-              Log In 
-            </Text>
-          </TouchableOpacity>
-        </Text>
       </View>
     </View>
   );
