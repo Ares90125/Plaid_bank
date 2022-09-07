@@ -5,11 +5,89 @@ import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-nati
 import { theme } from '../core/theme';
 import Button from '../components/Button';
 import TextInput from '../components/TextInput';
+import { PRIME_TRUST_URL } from '@env';
+import axios from 'axios';
+import { User } from '../module/user/User'
+import { userStore } from '../module/user/UserStore'
 
 export default function SignupScreen({ navigation }) {
   const [isSelected, setSelection] = useState(false);
   const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
+  const [conpassword, setConPassword] = useState({ value: '', error: '' })
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [conpin, setConpin] = useState({ value: '', error: '' });
+  const [def, setDef] = useState('');
+  const [pin, setPin] = useState('');
+  const validate = () => {
+    if (email.value == '' || password == '' || pin == '') {
+      alert('please enterr all data');
+      return;
+    }
+    if (!validateEmail(email.value)) {
+      setEmail({ value: email.value, error: 'invalid email' });
+      return;
+    }
+    if (password !== conpassword.value) {
+      setConPassword({ value: conpassword.value, error: 'not match password' });
+      return;
+    }
+    if (pin !== conpin.value) {
+      setConpin({ value: conpin.value, error: 'not match pin' });
+      return;
+    }
+    getToken();
+  }
+  const validateEmail = (email) => {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  };
+  const getToken = async () => {
+    await fetch(
+      `${PRIME_TRUST_URL}auth/jwts?email=${email.value}&password=${password}`,
+      {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          // 'Username': email,
+          // 'Password': password.value,
+        },//flm reference
+      }
+    ).then(res => res.json()).then((data) => {
+      const loginResponse = {
+        userId: 1,
+        authToken: data.token,
+        refreshToken: 'test',
+        permission: 0,
+      };
+      const user = User.fromJson(loginResponse, email.value);
+      userStore.setUser(user);
+      navigation.navigate('SelectaccountScreen');
+    }).catch(err => { createUser(); });
+  };
+  const createUser = async () => {
+    await axios({
+      method: "POST",
+      data: {
+        data: {
+          type: "user",
+          attributes: {
+            email: email.value,
+            name: username,
+            password: password.value,
+          },
+        },
+      },
+      url: `${PRIME_TRUST_URL}v2/users`,
+    })
+      .then((response) => {
+
+      })
+      .catch((err) => {
+        console.log("error", err?.response?.data?.errors[0]?.title);
+        res.status(400).send({ message: err.response?.data?.errors[0]?.title });
+      });
+  };
   return (
     <ScrollView contentContainerStyle={{ paddingVertical: 110 }} style={styles.container}>
       <View style={styles.header}>
@@ -21,31 +99,15 @@ export default function SignupScreen({ navigation }) {
         </Text>
       </View>
       <View style={styles.body}>
-        <View style={styles.doublegroup}>
-          <View style={[styles.inputgroup, { width: '45%' }]}>
-            <Text style={styles.label}>First Name</Text>
-            <TextInput
-              placeholder="Enter First Name"
-              returnKeyType="next"
-              value={email.value}
-              onChangeText={(text) => setEmail({ value: text, error: '' })}
-              error={!!email.error}
-              errorText={email.error}
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={[styles.inputgroup, { width: '45%' }]}>
-            <Text style={styles.label}>Last Name</Text>
-            <TextInput
-              placeholder="Enter Last Name"
-              returnKeyType="next"
-              value={email.value}
-              onChangeText={(text) => setEmail({ value: text, error: '' })}
-              error={!!email.error}
-              errorText={email.error}
-              autoCapitalize="none"
-            />
-          </View>
+        <View style={styles.inputgroup}>
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            placeholder="username"
+            returnKeyType="next"
+            value={username}
+            onChangeText={(text) => setUsername(text)}
+            autoCapitalize="none"
+          />
         </View>
         <View style={styles.inputgroup}>
           <Text style={styles.label}>Email</Text>
@@ -63,76 +125,26 @@ export default function SignupScreen({ navigation }) {
           />
         </View>
         <View style={styles.inputgroup}>
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput
-            placeholder="(000)-000-0000"
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.doublegroup}>
-          <View style={[styles.inputgroup, { width: '45%' }]}>
-            <Text style={styles.label}>City</Text>
-            <TextInput
-              placeholder="Enter City"
-              returnKeyType="next"
-              value={email.value}
-              onChangeText={(text) => setEmail({ value: text, error: '' })}
-              error={!!email.error}
-              errorText={email.error}
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={[styles.inputgroup, { width: '45%' }]}>
-            <Text style={styles.label}>State</Text>
-            <TextInput
-              placeholder="Enter State"
-              returnKeyType="next"
-              value={email.value}
-              onChangeText={(text) => setEmail({ value: text, error: '' })}
-              error={!!email.error}
-              errorText={email.error}
-              autoCapitalize="none"
-            />
-          </View>
-        </View>
-        <View style={styles.inputgroup}>
-          <Text style={styles.label}>Country</Text>
-          <TextInput
-            placeholder="Enter Country"
-            returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
-            autoCapitalize="none"
-          />
-        </View>
-        <View style={styles.inputgroup}>
           <Text style={styles.label}>Password</Text>
           <TextInput
+            secureTextEntry={true}
             placeholder="Password must be at least 8 characters long"
             returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
             autoCapitalize="none"
           />
         </View>
         <View style={styles.inputgroup}>
           <Text style={styles.label}>Confirm Password</Text>
           <TextInput
+            secureTextEntry={true}
             placeholder="Re-enter your password"
             returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
+            value={conpassword}
+            onChangeText={(text) => setConPassword({ value: text, error: '' })}
+            error={!!conpassword.error}
+            errorText={conpassword.error}
             autoCapitalize="none"
           />
         </View>
@@ -141,26 +153,25 @@ export default function SignupScreen({ navigation }) {
           <TextInput
             placeholder="PIN number must be 4 digits "
             returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
+            value={pin}
+            onChangeText={(text) => setPin(text)}
             autoCapitalize="none"
           />
+
         </View>
         <View style={styles.inputgroup}>
           <Text style={styles.label}>Confirm PIN</Text>
           <TextInput
             placeholder="Re-enter your PIN number"
             returnKeyType="next"
-            value={password.value}
-            onChangeText={(text) => setPassword({ value: text, error: '' })}
-            error={!!email.error}
-            errorText={email.error}
+            value={conpin}
+            onChangeText={(text) => setConpin({ value: text, error: '' })}
+            error={!!conpin.error}
+            errorText={conpin.error}
             autoCapitalize="none"
           />
         </View>
-        <Button onPress={() => { navigation.navigate('LinkbankScreen'); }} color={theme.colors.backgroundColor} style={styles.mannual}>
+        <Button onPress={() => { validate() }} color={theme.colors.backgroundColor} style={styles.mannual}>
           <Text style={styles.bttext}>
             Sign Up
           </Text>
