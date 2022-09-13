@@ -39,7 +39,7 @@ export default function LoginScreen({ navigation }) {
     })
       .then((response) => {
         console.log('backgetemail', response);
-        primeLogin(response.data.email, response.data.accountId);
+        primeLogin(response.data.email, response.data.accountId, response.data.contactId);
       })
       .catch((err) => {
         console.log("error", err);
@@ -47,7 +47,7 @@ export default function LoginScreen({ navigation }) {
         handleOpenModalPress();
       });
   }
-  const primeLogin = async (email1, id) => {
+  const primeLogin = async (email1, id, contactId) => {
     await axios(
       // `${PRIME_TRUST_URL}auth/jwts?email=${email.value}&password=${password}`,
       {
@@ -60,6 +60,7 @@ export default function LoginScreen({ navigation }) {
     ).then((data) => {
       const loginResponse = {
         userId: id,
+        contactId: contactId,
         authToken: data.data.token,
         username: email.value,
         permission: 1,
